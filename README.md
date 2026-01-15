@@ -2,6 +2,23 @@
 
 A single-user web application that automates the entire Request for Proposal (RFP) procurement workflow using AI.
 
+## ✨ Latest Updates (v2.0)
+
+### 🎨 Modern UI Enhancements
+- **Beautiful Gradient Design**: Purple gradient background with glassmorphism effects
+- **Smooth Animations**: Hover effects, transitions, and button ripples
+- **Enhanced Typography**: Inter font for modern, professional look
+- **Elevated Cards**: 3D shadows with hover lift effects
+- **Gradient Buttons**: Eye-catching CTAs with ripple animations
+- **Improved Status Badges**: Gradient-styled badges with better visibility
+
+### 🔧 Technical Improvements
+- **Better Proposal Scoring**: Relative price comparison for accurate vendor ranking
+- **Fixed Gemini API**: Updated to stable `gemini-pro` model
+- **Vendor/Proposal Counts**: Real-time counts on RFP list page
+- **Email Reply-To**: Automatic reply routing to main inbox
+- **Enhanced Fallback Parsing**: Better item extraction for office furniture, IT equipment
+
 ## 🎯 Assignment Requirements Met
 
 ### ✅ Core Functionality
@@ -164,6 +181,51 @@ curl -X POST http://localhost:3001/api/proposals \
 - **Google Gemini** - Natural language processing
 - **SendGrid** - Email sending/receiving
 - **Intelligent Fallbacks** - Works without external APIs
+
+## 📧 Email Setup Guide
+
+### For Testing/Demo (FREE)
+
+**Use Gmail addresses for all vendors:**
+- Vendor 1: `yourname1@gmail.com`
+- Vendor 2: `yourname2@gmail.com`
+- Vendor 3: `yourname3@gmail.com`
+
+**Why Gmail?**
+- ✅ Completely free
+- ✅ Works for demo/testing
+- ✅ Emails arrive (check spam folder)
+- ✅ Mark as "Not Spam" for future delivery
+
+**Setup Steps:**
+1. Create Gmail App Password for IMAP:
+   - Go to: https://myaccount.google.com/apppasswords
+   - Generate password for "Mail"
+   - Add to `.env` as `GMAIL_APP_PASSWORD`
+
+2. Configure SendGrid:
+   - Sign up: https://sendgrid.com (Free: 100 emails/day)
+   - Verify sender email
+   - Add API key to `.env`
+
+3. Send RFP to vendors
+4. Vendors reply (emails go to spam initially)
+5. Move replies from Spam to Inbox
+6. Mark as "Not Spam"
+7. App auto-detects replies via IMAP
+
+### For Production (Paid)
+
+**Option 1: Own Domain ($12/year)**
+- Buy domain: `yourcompany.com`
+- Email: `noreply@yourcompany.com`
+- Add SPF/DKIM records in SendGrid
+- Result: 95% inbox delivery rate
+
+**Option 2: SendGrid Subdomain (FREE)**
+- SendGrid provides: `em1234.sendgrid.net`
+- Automatic authentication
+- Result: 80% inbox delivery rate
 
 ## 🎯 Assignment Compliance
 
