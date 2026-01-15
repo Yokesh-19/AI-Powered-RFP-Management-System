@@ -59,8 +59,10 @@ const Layout = ({ children }) => {
         </div>
       </nav>
 
-      <main className="container" style={{ padding: '2rem 20px' }}>
-        {children}
+      <main className="page-wrapper">
+        <div className="container">
+          {children}
+        </div>
       </main>
     </div>
   );

@@ -32,57 +32,80 @@ class AIService {
       console.log('Gemini failed, using fallback parsing...', error.message);
     }
 
-    // Fallback: Simple parsing
+    // Fallback: Enhanced parsing for multiple item types
     const words = naturalLanguage.toLowerCase();
     const items = [];
     
-    // Extract laptops
-    if (words.includes('laptop')) {
-      const laptopMatch = words.match(/(\d+)\s*laptop/);
-      if (laptopMatch) {
+    // Define item patterns
+    const itemPatterns = [
+      { regex: /(\d+)\s*(?:office\s+)?chairs?/i, name: 'Office Chairs', defaultSpec: 'Ergonomic design with lumbar support', price: 300 },
+      { regex: /(\d+)\s*(?:standing\s+)?desks?/i, name: 'Standing Desks', defaultSpec: 'Electric height adjustment', price: 800 },
+      { regex: /(\d+)\s*(?:desk\s+)?lamps?/i, name: 'Desk Lamps', defaultSpec: 'LED lighting', price: 50 },
+      { regex: /(\d+)\s*laptops?/i, name: 'Laptops', defaultSpec: '16GB RAM, 512GB SSD', price: 1500 },
+      { regex: /(\d+)\s*monitors?/i, name: 'Monitors', defaultSpec: '24-inch LCD', price: 300 },
+      { regex: /(\d+)\s*(?:wireless\s+)?(?:mice|mouse)/i, name: 'Wireless Mice', defaultSpec: 'Wireless connectivity', price: 25 },
+      { regex: /(\d+)\s*(?:wireless\s+)?keyboards?/i, name: 'Wireless Keyboards', defaultSpec: 'Wireless connectivity', price: 50 },
+      { regex: /(\d+)\s*(?:laptop\s+)?bags?/i, name: 'Laptop Bags', defaultSpec: 'Padded protection', price: 40 }
+    ];
+    
+    // Extract all matching items
+    itemPatterns.forEach(pattern => {
+      const match = naturalLanguage.match(pattern.regex);
+      if (match) {
+        const quantity = parseInt(match[1]);
+        
+        // Extract specifications from context
+        let specifications = pattern.defaultSpec;
+        const contextStart = Math.max(0, match.index - 50);
+        const contextEnd = Math.min(naturalLanguage.length, match.index + match[0].length + 100);
+        const context = naturalLanguage.substring(contextStart, contextEnd);
+        
+        // Look for specifications in context
+        if (context.toLowerCase().includes('ergonomic') || context.toLowerCase().includes('lumbar')) {
+          specifications = 'Ergonomic design with lumbar support';
+        } else if (context.toLowerCase().includes('electric') || context.toLowerCase().includes('height adjustment')) {
+          specifications = 'Electric height adjustment';
+        } else if (context.toLowerCase().includes('led')) {
+          specifications = 'LED lighting';
+        } else if (context.toLowerCase().includes('16gb') || context.toLowerCase().includes('i7')) {
+          specifications = '16GB RAM, Intel i7 processor';
+        }
+        
         items.push({
-          name: "Laptops",
-          quantity: parseInt(laptopMatch[1]),
-          specifications: words.includes('16gb') ? '16GB RAM, 512GB SSD' : 'Standard specs',
-          estimatedPrice: 1500
+          name: pattern.name,
+          quantity: quantity,
+          specifications: specifications,
+          estimatedPrice: pattern.price
         });
       }
-    }
+    });
     
-    // Extract monitors
-    if (words.includes('monitor')) {
-      const monitorMatch = words.match(/(\d+)\s*monitor/);
-      if (monitorMatch) {
-        items.push({
-          name: "Monitors",
-          quantity: parseInt(monitorMatch[1]),
-          specifications: '24-inch LCD',
-          estimatedPrice: 300
-        });
-      }
-    }
-    
-    // Extract budget
+    // Extract budget with better pattern matching
     let budget = null;
-    const budgetMatch = words.match(/budget[\s:]*\$?(\d+,?\d*)/i) || words.match(/\$?(\d+,?\d*)/);
-    if (budgetMatch) {
-      let amount = parseInt(budgetMatch[1].replace(',', ''));
-      // Handle specific amounts
-      if (words.includes('80000') || words.includes('80,000')) {
-        amount = 80000;
-      } else if (words.includes('50000') || words.includes('50,000')) {
-        amount = 50000;
-      } else if (words.includes('k') && amount < 1000) {
-        amount = amount * 1000;
+    const budgetPatterns = [
+      /budget[\s:is]*\$?([\d,]+)/i,
+      /\$([\d,]+)\s*budget/i,
+      /\$([\d,]+)/
+    ];
+    
+    for (const pattern of budgetPatterns) {
+      const match = naturalLanguage.match(pattern);
+      if (match) {
+        let amount = parseInt(match[1].replace(/,/g, ''));
+        if (amount > 100) { // Reasonable budget threshold
+          budget = amount;
+          break;
+        }
       }
-      budget = amount;
     }
     
-    // Extract delivery
+    // Extract delivery with flexible day matching
     let deliveryDate = null;
-    if (words.includes('30 day') || words.includes('month')) {
+    const deliveryMatch = naturalLanguage.match(/(\d+)\s*days?/i);
+    if (deliveryMatch) {
+      const days = parseInt(deliveryMatch[1]);
       const futureDate = new Date();
-      futureDate.setDate(futureDate.getDate() + 30);
+      futureDate.setDate(futureDate.getDate() + days);
       deliveryDate = futureDate.toISOString().split('T')[0];
     }
 
@@ -397,6 +420,11 @@ Return ONLY valid JSON, no markdown.`;
     const rfpBudget = rfpContext.budget || 999999;
     const rfpDeliveryDate = rfpContext.deliveryDate ? new Date(rfpContext.deliveryDate) : null;
     
+    // Find lowest price for relative scoring
+    const prices = proposals.map(p => p.totalPrice).filter(p => p !== null);
+    const lowestPrice = prices.length > 0 ? Math.min(...prices) : 0;
+    const highestPrice = prices.length > 0 ? Math.max(...prices) : 0;
+    
     const analysis = proposals.map(proposal => {
       const scores = {
         price: 0,
@@ -406,14 +434,33 @@ Return ONLY valid JSON, no markdown.`;
         completeness: 0
       };
       
-      // Price scoring (40 points)
+      // Price scoring (40 points) - Relative to other proposals AND budget
       if (proposal.totalPrice) {
+        // First check budget compliance
         const priceRatio = proposal.totalPrice / rfpBudget;
-        if (priceRatio <= 0.8) scores.price = 40;
-        else if (priceRatio <= 0.9) scores.price = 35;
-        else if (priceRatio <= 1.0) scores.price = 30;
-        else if (priceRatio <= 1.1) scores.price = 20;
-        else scores.price = 10;
+        let budgetScore = 0;
+        
+        if (priceRatio <= 0.7) budgetScore = 20;      // 70% or less of budget
+        else if (priceRatio <= 0.8) budgetScore = 18; // 80% of budget
+        else if (priceRatio <= 0.9) budgetScore = 16; // 90% of budget
+        else if (priceRatio <= 1.0) budgetScore = 14; // At budget
+        else if (priceRatio <= 1.1) budgetScore = 8;  // 10% over
+        else budgetScore = 4; // More than 10% over
+        
+        // Then compare to other proposals (relative scoring)
+        let relativeScore = 0;
+        if (prices.length > 1 && highestPrice > lowestPrice) {
+          // Best price gets 20 points, worst gets 0, others scaled
+          const priceRange = highestPrice - lowestPrice;
+          const pricePosition = highestPrice - proposal.totalPrice;
+          relativeScore = Math.round((pricePosition / priceRange) * 20);
+        } else if (proposal.totalPrice === lowestPrice) {
+          relativeScore = 20; // Only one proposal or tied for best
+        } else {
+          relativeScore = 10; // Default middle score
+        }
+        
+        scores.price = budgetScore + relativeScore; // Max 40 points
       }
       
       // Delivery scoring (25 points)
@@ -431,8 +478,9 @@ Return ONLY valid JSON, no markdown.`;
       // Warranty scoring (15 points)
       if (proposal.warranty) {
         const warrantyText = proposal.warranty.toLowerCase();
-        if (warrantyText.includes('2 year') || warrantyText.includes('24 month')) scores.warranty = 15;
-        else if (warrantyText.includes('1 year') || warrantyText.includes('12 month')) scores.warranty = 10;
+        if (warrantyText.includes('3 year') || warrantyText.includes('36 month')) scores.warranty = 15;
+        else if (warrantyText.includes('2 year') || warrantyText.includes('24 month')) scores.warranty = 12;
+        else if (warrantyText.includes('1 year') || warrantyText.includes('12 month')) scores.warranty = 8;
         else scores.warranty = 5;
       }
       

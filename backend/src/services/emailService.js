@@ -31,6 +31,7 @@ class EmailService {
       const msg = {
         to: vendor.email,
         from: process.env.SENDGRID_FROM_EMAIL,
+        replyTo: process.env.GMAIL_USER || process.env.SENDGRID_FROM_EMAIL,
         subject: `RFP: ${rfp.title}`,
         html: emailContent,
       };

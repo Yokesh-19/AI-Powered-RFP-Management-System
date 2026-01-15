@@ -72,12 +72,22 @@ router.get('/', async (req, res) => {
     const db = getDB();
     const rfps = await db.collection('rfps').find({}).sort({ createdAt: -1 }).toArray();
 
-    // Add empty arrays for proposals and rfpVendors for compatibility
-    const rfpsWithRelations = rfps.map(rfp => ({
-      ...rfp,
-      id: rfp._id.toString(),
-      proposals: [],
-      rfpVendors: []
+    // Fetch vendor and proposal counts for each RFP
+    const rfpsWithRelations = await Promise.all(rfps.map(async (rfp) => {
+      const rfpId = rfp._id.toString();
+      
+      // Count vendors sent to
+      const vendorCount = await db.collection('rfp_vendors').countDocuments({ rfpId });
+      
+      // Count proposals received
+      const proposalCount = await db.collection('proposals').countDocuments({ rfpId });
+      
+      return {
+        ...rfp,
+        id: rfpId,
+        rfpVendors: Array(vendorCount).fill({}), // Array with correct length for count
+        proposals: Array(proposalCount).fill({})  // Array with correct length for count
+      };
     }));
 
     res.json(rfpsWithRelations);
