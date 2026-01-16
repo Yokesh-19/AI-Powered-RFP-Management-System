@@ -1,10 +1,9 @@
 # ========================================
-# SENSITIVE FILES - NEVER COMMIT THESE!
+# SENSITIVE FILES
 # ========================================
-.env
+# Note: backend/.env is committed for interviewer evaluation
 .env.local
 .env.*.local
-backend/.env
 frontend/.env
 
 # API Keys and Secrets
