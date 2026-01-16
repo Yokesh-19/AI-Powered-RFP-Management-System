@@ -193,6 +193,34 @@ NODE_ENV=development
 - Gmail App Password has spaces (e.g., `abcd efgh ijkl mnop`)
 - Verify your email in SendGrid: Settings → Sender Authentication
 
+---
+
+### ⚡ Quick Start for Interviewers/Evaluators
+
+**For immediate testing, working API credentials are already included in `backend/.env` file:**
+
+- ✅ Google Gemini API Key (pre-configured)
+- ✅ SendGrid API Key (pre-configured)
+- ✅ Gmail IMAP credentials (pre-configured)
+- ✅ Verified sender email: yokipers@gmail.com
+
+**You can skip the API key setup and run the application directly:**
+
+```bash
+# Just install dependencies and run
+cd backend && npm install
+cd ../frontend && npm install
+
+# Start MongoDB
+net start MongoDB  # Windows
+
+# Run application
+cd backend && npm run dev   # Terminal 1
+cd frontend && npm start    # Terminal 2
+```
+
+**Note:** These credentials are provided for evaluation purposes only. In production environments, always use your own API keys and never commit them to version control.
+
 ### Step 3: Verify SendGrid Email
 
 1. Go to: https://app.sendgrid.com/settings/sender_auth/senders
