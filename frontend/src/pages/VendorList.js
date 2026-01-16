@@ -13,7 +13,7 @@ const VendorList = () => {
 
   const fetchVendors = async () => {
     try {
-      const response = await vendorAPI.getAll();
+      const response = await vendorAPI.getAll();                   //gets all vendors from backend
       setVendors(response.data);
     } catch (error) {
       console.error('Error fetching vendors:', error);
@@ -29,7 +29,7 @@ const VendorList = () => {
     }
 
     try {
-      await vendorAPI.delete(id);
+      await vendorAPI.delete(id);                                             //sends delete request to backend to delete vendor by id
       toast.success('Vendor deleted successfully');
       fetchVendors();
     } catch (error) {
@@ -57,7 +57,7 @@ const VendorList = () => {
         </div>
       </div>
 
-      {vendors.length === 0 ? (
+      {vendors.length === 0 ? (                                                  //if there is no vendor, it allows you to create new vendor
         <div className="text-center" style={{ padding: '3rem' }}>
           <h3 className="font-bold mb-4">No Vendors</h3>
           <p className="text-sm mb-4" style={{ color: '#6b7280' }}>
@@ -88,7 +88,7 @@ const VendorList = () => {
                   <td>{vendor.contactPerson || '-'}</td>
                   <td>
                     <Link
-                      to={`/vendors/${vendor.id}/edit`}
+                      to={`/vendors/${vendor.id}/edit`}                                                        //navigates to edit page
                       style={{ color: '#2563eb', textDecoration: 'none', marginRight: '1rem' }}
                     >
                       Edit

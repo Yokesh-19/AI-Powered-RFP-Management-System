@@ -2,399 +2,665 @@
 
 A single-user web application that automates the entire Request for Proposal (RFP) procurement workflow using AI.
 
-## ✨ Latest Updates (v2.0)
+---
 
-### 🎨 Modern UI Enhancements
-- **Beautiful Gradient Design**: Purple gradient background with glassmorphism effects
-- **Smooth Animations**: Hover effects, transitions, and button ripples
-- **Enhanced Typography**: Inter font for modern, professional look
-- **Elevated Cards**: 3D shadows with hover lift effects
-- **Gradient Buttons**: Eye-catching CTAs with ripple animations
-- **Improved Status Badges**: Gradient-styled badges with better visibility
+## 📋 Table of Contents
+1. [Features](#features)
+2. [Prerequisites](#prerequisites)
+3. [Installation Guide](#installation-guide)
+4. [Configuration](#configuration)
+5. [Running the Application](#running-the-application)
+6. [Usage Guide](#usage-guide)
+7. [API Documentation](#api-documentation)
+8. [Troubleshooting](#troubleshooting)
 
-### 🔧 Technical Improvements
-- **Better Proposal Scoring**: Relative price comparison for accurate vendor ranking
-- **Fixed Gemini API**: Updated to stable `gemini-pro` model
-- **Vendor/Proposal Counts**: Real-time counts on RFP list page
-- **Email Reply-To**: Automatic reply routing to main inbox
-- **Enhanced Fallback Parsing**: Better item extraction for office furniture, IT equipment
+---
 
-## 🎯 Assignment Requirements Met
+## ✨ Features
 
-### ✅ Core Functionality
+### Core Functionality
 - **Natural Language RFP Creation**: AI converts plain English to structured RFPs
 - **Vendor Management**: Store and manage vendor contact information
 - **Email Integration**: Real SendGrid integration for sending RFPs to vendors
+- **Gmail Auto-Detection**: Automatically detects and parses vendor email replies
 - **AI Response Parsing**: Automatically extract pricing and terms from vendor emails
 - **AI Comparison**: Intelligent proposal analysis with recommendations
 
-### ✅ Technical Requirements
-- **Modern Web Stack**: React frontend + Node.js/Express backend
-- **Database**: MongoDB for data persistence
-- **AI Integration**: Google Gemini for natural language processing
-- **Email System**: SendGrid for real email sending/receiving
+### Technical Stack
+- **Frontend**: React 18, JavaScript, CSS
+- **Backend**: Node.js, Express
+- **Database**: MongoDB
+- **AI**: Google Gemini API
+- **Email**: SendGrid + Gmail IMAP
 
-## 🚀 Quick Start
+---
 
-### Prerequisites
-- Node.js 18+
-- MongoDB (running locally)
-- Gemini API Key (Google AI Studio)
-- SendGrid API Key (for email functionality)
+## 🔧 Prerequisites
 
-### 1. Installation
+Before you begin, ensure you have the following installed:
+
+### Required Software
+1. **Node.js** (v18 or higher)
+   - Download: https://nodejs.org/
+   - Verify: `node --version`
+
+2. **MongoDB** (v5.0 or higher)
+   - Download: https://www.mongodb.com/try/download/community
+   - Verify: `mongod --version`
+
+3. **Git** (for cloning repository)
+   - Download: https://git-scm.com/
+   - Verify: `git --version`
+
+### Required API Keys (FREE)
+
+1. **Google Gemini API Key**
+   - Go to: https://makersuite.google.com/app/apikey
+   - Click "Create API Key"
+   - Copy the key (starts with `AIza...`)
+
+2. **SendGrid API Key**
+   - Sign up: https://signup.sendgrid.com/ (Free: 100 emails/day)
+   - Go to: Settings → API Keys → Create API Key
+   - Select "Full Access"
+   - Copy the key (starts with `SG.`)
+
+3. **Gmail App Password** (for receiving emails)
+   - Go to: https://myaccount.google.com/apppasswords
+   - Select "Mail" and generate password
+   - Copy the 16-character password
+
+---
+
+## 📥 Installation Guide
+
+### Step 1: Download/Clone the Project
+
+**Option A: Download ZIP**
+```bash
+# Extract the ZIP file to your desired location
+# Example: C:\Users\YourName\Desktop\RFP Management System
+```
+
+**Option B: Clone from Git**
+```bash
+git clone <repository-url>
+cd "RFP Management System"
+```
+
+### Step 2: Install Backend Dependencies
 
 ```bash
-# Backend
+# Navigate to backend folder
 cd backend
-npm install
 
-# Frontend
+# Install all required packages
+npm install
+```
+
+**Packages installed:**
+- express (web server)
+- mongodb (database driver)
+- @google/generative-ai (Gemini AI)
+- @sendgrid/mail (email sending)
+- imap (email receiving)
+- mailparser (email parsing)
+- cors, helmet, dotenv (utilities)
+
+### Step 3: Install Frontend Dependencies
+
+```bash
+# Navigate to frontend folder (from project root)
 cd ../frontend
+
+# Install all required packages
 npm install
 ```
 
-### 2. Environment Setup
+**Packages installed:**
+- react, react-dom (UI framework)
+- react-router-dom (routing)
+- axios (API calls)
+- react-hot-toast (notifications)
 
-**Backend (.env):**
+---
+
+## ⚙️ Configuration
+
+### Step 1: Start MongoDB
+
+**Windows:**
 ```bash
-cd backend
-cp .env.example .env
-```
-
-Edit `.env` with your API keys:
-```
-DATABASE_URL="mongodb://localhost:27017/rfp_system"
-GEMINI_API_KEY="your_gemini_api_key_here"
-SENDGRID_API_KEY="your_sendgrid_api_key_here"
-SENDGRID_FROM_EMAIL="your_verified_email@domain.com"
-PORT=3001
-```
-
-### 3. Database Setup
-
-```bash
-# Ensure MongoDB is running
+# Open Command Prompt as Administrator
 net start MongoDB
 
-# Initialize database (automatic on first run)
-npm run dev
+# Or start MongoDB manually
+"C:\Program Files\MongoDB\Server\7.0\bin\mongod.exe" --dbpath="C:\data\db"
 ```
 
-### 4. Start Application
-
-**Terminal 1 - Backend:**
+**Mac/Linux:**
 ```bash
+# Start MongoDB service
+sudo systemctl start mongod
+
+# Or use brew (Mac)
+brew services start mongodb-community
+```
+
+**Verify MongoDB is running:**
+```bash
+# Should connect without errors
+mongosh
+```
+
+### Step 2: Configure Backend Environment
+
+```bash
+# Navigate to backend folder
+cd backend
+
+# Create .env file from example
+copy .env.example .env    # Windows
+# OR
+cp .env.example .env      # Mac/Linux
+```
+
+**Edit `backend/.env` file with your API keys:**
+
+```env
+# Database
+DATABASE_URL="mongodb://localhost:27017/rfp_system"
+
+# Google Gemini AI (REQUIRED)
+GEMINI_API_KEY="AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
+# SendGrid Email (REQUIRED for sending RFPs)
+SENDGRID_API_KEY="SG.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+SENDGRID_FROM_EMAIL="your-email@gmail.com"
+
+# Gmail IMAP (REQUIRED for receiving vendor replies)
+GMAIL_USER="your-email@gmail.com"
+GMAIL_APP_PASSWORD="xxxx xxxx xxxx xxxx"
+
+# Server
+PORT=3001
+NODE_ENV=development
+```
+
+**Important Notes:**
+- Replace `your-email@gmail.com` with your actual Gmail address
+- Use the same Gmail for both `SENDGRID_FROM_EMAIL` and `GMAIL_USER`
+- Gmail App Password has spaces (e.g., `abcd efgh ijkl mnop`)
+- Verify your email in SendGrid: Settings → Sender Authentication
+
+### Step 3: Verify SendGrid Email
+
+1. Go to: https://app.sendgrid.com/settings/sender_auth/senders
+2. Click "Create New Sender"
+3. Fill in your details (use your Gmail)
+4. Check your Gmail for verification email
+5. Click verification link
+6. Status should show "Verified"
+
+---
+
+## 🚀 Running the Application
+
+### Step 1: Start Backend Server
+
+```bash
+# Open Terminal 1
 cd backend
 npm run dev
 ```
 
-**Terminal 2 - Frontend:**
+**Expected output:**
+```
+[nodemon] starting `node src/server.js`
+🚀 Server running on http://localhost:3001
+✅ Connected to MongoDB
+```
+
+**If you see errors:**
+- MongoDB not running → Start MongoDB first
+- Port 3001 in use → Change PORT in .env
+- Database connection failed → Check DATABASE_URL
+
+### Step 2: Start Frontend Server
+
 ```bash
+# Open Terminal 2 (new terminal window)
 cd frontend
 npm start
 ```
 
-**Access:** http://localhost:3000
-
-## 📋 API Documentation
-
-### RFP Endpoints
-- `POST /api/rfps` - Create RFP from natural language
-  - Body: `{ "description": "I need 20 laptops..." }`
-  - Response: Structured RFP with AI-parsed items, budget, delivery date
-
-- `GET /api/rfps` - List all RFPs
-- `GET /api/rfps/:id` - Get specific RFP
-- `POST /api/rfps/:id/send` - Send RFP to selected vendors
-  - Body: `{ "vendorIds": ["vendor1_id", "vendor2_id"] }`
-
-### Vendor Endpoints
-- `POST /api/vendors` - Create vendor
-  - Body: `{ "name": "TechCorp", "email": "sales@techcorp.com" }`
-- `GET /api/vendors` - List all vendors
-- `PUT /api/vendors/:id` - Update vendor
-
-### Proposal Endpoints
-- `POST /api/proposals` - Create proposal (simulate vendor response)
-  - Body: `{ "rfpId": "...", "vendorId": "...", "rawContent": "email content" }`
-- `GET /api/proposals/rfp/:rfpId` - Get proposals for RFP
-- `POST /api/proposals/compare/:rfpId` - AI comparison of proposals
-
-## 🎬 Demo Workflow
-
-### 1. Create RFP
+**Expected output:**
 ```
-Input: "I need 20 laptops with 16GB RAM, 15 monitors, budget $50000, delivery 30 days"
-Output: Structured RFP with parsed items, budget, delivery date
+Compiled successfully!
+
+You can now view frontend in the browser.
+
+  Local:            http://localhost:3000
+  On Your Network:  http://192.168.x.x:3000
 ```
+
+**Browser should automatically open to:** http://localhost:3000
+
+### Step 3: Verify Application is Running
+
+1. **Frontend**: http://localhost:3000 (should show dashboard)
+2. **Backend**: http://localhost:3001/health (should show `{"status":"OK"}`)
+
+---
+
+## 📖 Usage Guide
+
+### 1. Create Your First RFP
+
+1. Click **"Create New RFP"**
+2. Enter natural language description:
+   ```
+   I need 50 Dell or HP laptops with Intel i7 processor, 16GB RAM, 512GB SSD, 
+   and Windows 11 Pro. Also need 50 wireless keyboards, 50 wireless mice, 
+   and 3 network switches with 24 ports each. Budget is $85,000. 
+   Delivery required within 30 days. Payment terms: Net 30. 
+   Warranty must be at least 1 year.
+   ```
+3. Click **"Create RFP"**
+4. AI will parse and structure the RFP automatically
 
 ### 2. Add Vendors
-- TechCorp Solutions (sales@techcorp.com)
-- Digital Supplies Inc (quotes@digitalsupplies.com)
 
-### 3. Send RFP
-- Select vendors → Click "Send to X vendor(s)"
-- Real emails sent via SendGrid (or demo mode if not configured)
+1. Click **"Vendors"** in navigation
+2. Click **"Add New Vendor"**
+3. Fill in details:
+   - **Name**: TechCorp Solutions
+   - **Email**: friend1@gmail.com (use real Gmail addresses)
+   - **Phone**: +1-555-0101
+   - **Contact Person**: John Smith
+4. Click **"Add Vendor"**
+5. Repeat for 2-3 vendors
+
+**Important:** Use real Gmail addresses you can access for testing!
+
+### 3. Send RFP to Vendors
+
+1. Go to **"RFPs"** → Click on your RFP
+2. Select vendors (check boxes)
+3. Click **"Send to X vendor(s)"**
+4. Emails will be sent via SendGrid
+5. Check vendor Gmail inboxes (may be in Spam folder)
 
 ### 4. Simulate Vendor Responses
-```bash
-curl -X POST http://localhost:3001/api/proposals \
-  -H "Content-Type: application/json" \
-  -d '{"rfpId":"RFP_ID","vendorId":"VENDOR_ID","rawContent":"We quote $40,000 for 20 laptops, delivery in 25 days"}'
-```
 
-### 5. AI Analysis
-- View parsed proposals with extracted pricing
-- Click "Compare Proposals" for AI recommendations
+**Option A: Reply via Email (Realistic)**
+1. Open vendor Gmail inbox
+2. Find RFP email (check Spam folder)
+3. Click Reply
+4. Write proposal:
+   ```
+   Dear Procurement Team,
 
-## 🏗️ Architecture & Design Decisions
+   Thank you for your RFP. We are pleased to submit our proposal:
 
-### Data Models
-- **RFP**: title, description, items[], budget, deliveryDate, status
-- **Vendor**: name, email, phone, contactPerson
-- **Proposal**: rfpId, vendorId, rawContent, parsedData, aiAnalysis
+   PRICING BREAKDOWN:
+   - 50x Dell Latitude 5540 Laptops (i7, 16GB RAM, 512GB SSD, Win11 Pro): $1,450 each = $72,500
+   - 50x Logitech K380 Wireless Keyboards: $35 each = $1,750
+   - 50x Logitech M720 Wireless Mice: $28 each = $1,400
+   - 3x Cisco SG250-26 24-Port Switches: $450 each = $1,350
 
-### AI Integration Strategy
-- **RFP Creation**: Gemini parses natural language → structured data
-- **Proposal Parsing**: Extracts pricing, terms, delivery from messy emails
-- **Comparison**: Scores proposals, identifies pros/cons, recommends vendor
+   TOTAL: $77,000
 
-### Email Integration
-- **SendGrid**: Professional email sending with HTML templates
-- **Fallback**: Demo mode when SendGrid not configured
-- **Parsing**: AI processes vendor email responses automatically
+   DELIVERY: 21 days from PO
+   WARRANTY: 3-year manufacturer warranty on laptops
+   PAYMENT TERMS: Net 30 days
 
-## 🔧 Tech Stack
+   Best regards,
+   John Smith
+   TechCorp Solutions
+   ```
+5. Send email
+6. Wait 30 seconds for auto-detection
 
-### Frontend
-- **React 18** - Modern UI framework
-- **JavaScript** - Simplified development
-- **CSS** - Custom styling for clean interface
+**Option B: Manual Entry (Quick Testing)**
+1. Go to **"Test Proposal"** page
+2. Select RFP and Vendor
+3. Paste vendor response
+4. Click **"Submit Proposal"**
 
-### Backend
-- **Node.js + Express** - RESTful API server
-- **MongoDB** - Document database for flexible schema
-- **Native MongoDB Driver** - Direct database operations
+### 5. Check for Vendor Emails
 
-### AI & Email
-- **Google Gemini** - Natural language processing
-- **SendGrid** - Email sending/receiving
-- **Intelligent Fallbacks** - Works without external APIs
+1. Go to **"Email Inbox"** in navigation
+2. Click **"🔄 Check for New Emails"**
+3. System will:
+   - Connect to Gmail via IMAP
+   - Find emails with "RFP" in subject
+   - Parse them with AI
+   - Create proposals automatically
 
-## 📧 Email Setup Guide
+**Or enable auto-checking:**
+- Click **"▶️ Start Auto-Check"**
+- System checks every 30 seconds
 
-### For Testing/Demo (FREE)
+### 6. Compare Proposals with AI
 
-**Use Gmail addresses for all vendors:**
-- Vendor 1: `yourname1@gmail.com`
-- Vendor 2: `yourname2@gmail.com`
-- Vendor 3: `yourname3@gmail.com`
-
-**Why Gmail?**
-- ✅ Completely free
-- ✅ Works for demo/testing
-- ✅ Emails arrive (check spam folder)
-- ✅ Mark as "Not Spam" for future delivery
-
-**Setup Steps:**
-1. Create Gmail App Password for IMAP:
-   - Go to: https://myaccount.google.com/apppasswords
-   - Generate password for "Mail"
-   - Add to `.env` as `GMAIL_APP_PASSWORD`
-
-2. Configure SendGrid:
-   - Sign up: https://sendgrid.com (Free: 100 emails/day)
-   - Verify sender email
-   - Add API key to `.env`
-
-3. Send RFP to vendors
-4. Vendors reply (emails go to spam initially)
-5. Move replies from Spam to Inbox
-6. Mark as "Not Spam"
-7. App auto-detects replies via IMAP
-
-### For Production (Paid)
-
-**Option 1: Own Domain ($12/year)**
-- Buy domain: `yourcompany.com`
-- Email: `noreply@yourcompany.com`
-- Add SPF/DKIM records in SendGrid
-- Result: 95% inbox delivery rate
-
-**Option 2: SendGrid Subdomain (FREE)**
-- SendGrid provides: `em1234.sendgrid.net`
-- Automatic authentication
-- Result: 80% inbox delivery rate
-
-## 🎯 Assignment Compliance
-
-### ✅ Required Features
-1. **Natural Language RFP Creation** - ✅ Implemented with AI parsing
-2. **Vendor Management** - ✅ Full CRUD operations
-3. **Email Sending** - ✅ Real SendGrid integration
-4. **Email Receiving** - ✅ API endpoint for vendor responses
-5. **AI Response Parsing** - ✅ Extracts pricing, terms, delivery
-6. **Proposal Comparison** - ✅ AI analysis with recommendations
-
-### ✅ Technical Requirements
-- **Modern Web Stack** - ✅ React + Node.js + Express
-- **Database** - ✅ MongoDB with proper schema
-- **Email System** - ✅ SendGrid for real email integration
-- **AI Integration** - ✅ Gemini for NLP, parsing, comparison
-
-### ✅ Evaluation Criteria
-- **Problem Understanding** - ✅ Complete procurement workflow
-- **Architecture** - ✅ Clean separation, error handling
-- **API Design** - ✅ RESTful, consistent, documented
-- **AI Integration** - ✅ Thoughtful prompting, fallbacks
-- **UX** - ✅ Intuitive workflow, clear feedback
-
-## 🚀 Production Deployment
-
-### Environment Variables
-```bash
-DATABASE_URL="mongodb://your-mongo-host:27017/rfp_system"
-GEMINI_API_KEY="your_production_gemini_key"
-SENDGRID_API_KEY="your_production_sendgrid_key"
-SENDGRID_FROM_EMAIL="noreply@yourcompany.com"
-```
-
-### Email Configuration
-1. Verify sender email in SendGrid
-2. Configure inbound parse webhook for receiving responses
-3. Set up email templates for professional RFP formatting
-
-## 🎯 Business Value
-
-### For Procurement Managers
-- **10x Faster**: RFP creation in minutes vs hours
-- **Zero Errors**: AI extracts data accurately
-- **Smart Decisions**: AI recommendations with reasoning
-- **Complete Audit Trail**: All data stored and tracked
-
-### For Companies
-- **Cost Savings**: Better vendor comparison
-- **Time Efficiency**: Automated workflow
-- **Professional Process**: Structured RFP management
-- **Scalable Solution**: Handle multiple RFPs simultaneously
-
-## 🤖 AI Tools Usage
-
-### Tools Used During Development
-
-**1. Amazon Q Developer (Primary)**
-- **Purpose**: Code generation, architecture design, debugging
-- **Usage**: 
-  - Generated boilerplate for React components and Express routes
-  - Designed data models and API structure
-  - Debugged MongoDB connection issues
-  - Optimized AI prompts for better parsing
-  - Created comprehensive error handling
-
-**2. Google Gemini AI (Production)**
-- **Purpose**: Natural language processing in the application
-- **Usage**:
-  - Parsing natural language RFP descriptions
-  - Extracting structured data from vendor emails
-  - Comparing proposals and generating recommendations
-  - Providing intelligent scoring and analysis
-
-### What AI Helped With
-
-**Boilerplate & Structure:**
-- React component scaffolding with hooks and state management
-- Express route handlers with validation
-- MongoDB schema design and queries
-- Error handling patterns
-
-**Design & Architecture:**
-- Separation of concerns (routes → services → utils)
-- RESTful API design patterns
-- Data model relationships
-- AI service abstraction with fallbacks
-
-**Debugging & Problem Solving:**
-- MongoDB ObjectId conversion issues
-- CORS configuration for local development
-- SendGrid email template formatting
-- AI prompt engineering for consistent JSON output
-
-**Testing & Validation:**
-- Test scripts for email functionality
-- API endpoint testing
-- Error scenario handling
-- Edge case identification
-
-### Notable Prompts & Approaches
-
-**1. RFP Parsing Prompt:**
-```
-"Convert this natural language to JSON with fields: title, description, 
-items (array with name, quantity, specifications), budget, deliveryDate, 
-paymentTerms. Return ONLY valid JSON."
-```
-
-**2. Proposal Parsing Prompt:**
-```
-"Parse this vendor email and extract ALL pricing information. 
-RFP Context: [items]. Extract: totalPrice, itemPrices[], deliveryDate, 
-warranty, terms. Handle any format: $1,000 / 1000 / 1k. Return JSON only."
-```
-
-**3. Comparison Prompt:**
-```
-"You are a procurement expert. Analyze these proposals using a 100-point 
-scoring system: Price (40), Delivery (25), Warranty (15), Terms (10), 
-Completeness (10). Provide detailed analysis with pros, cons, compliance 
-checks, and clear recommendation."
-```
-
-### What I Learned
-
-**1. AI-Assisted Development:**
-- AI tools significantly speed up boilerplate creation
-- Still need human oversight for business logic and edge cases
-- Prompt engineering is crucial for consistent AI output
-
-**2. Fallback Strategies:**
-- Always implement fallbacks when using external AI APIs
-- Regex-based parsing as backup for AI failures
-- Graceful degradation improves reliability
-
-**3. Prompt Engineering:**
-- Specific output format requests ("Return ONLY JSON") improve consistency
-- Providing context (RFP details) improves parsing accuracy
-- Structured prompts with clear criteria produce better results
-
-**4. Integration Patterns:**
-- Abstracting AI calls into service layer improves testability
-- Error handling at multiple levels (AI, network, parsing)
-- Caching and rate limiting considerations for production
-
-### Changes Made Because of AI Tools
-
-**Initial Approach:**
-- Manual form fields for RFP creation
-- Structured vendor response forms
-- Manual proposal comparison
-
-**AI-Enhanced Approach:**
-- Natural language RFP creation (more user-friendly)
-- Free-form email parsing (handles any vendor format)
-- Intelligent comparison with reasoning (better decision support)
-
-**Result:** More intuitive UX and significantly reduced manual data entry
+1. Go to your RFP details page
+2. Wait for 2+ proposals to arrive
+3. Click **"Compare Proposals with AI"**
+4. AI will analyze and provide:
+   - Score breakdown (100-point system)
+   - Pros and cons for each vendor
+   - Compliance checks
+   - Clear recommendation with reasoning
 
 ---
 
-## 🔮 Future Enhancements
+## 📡 API Documentation
 
-- **File Upload**: Handle PDF/Excel attachments
-- **Advanced Analytics**: Vendor performance tracking
-- **Workflow Automation**: Approval processes
-- **Integration**: ERP/Procurement system connectivity
+### RFP Endpoints
+
+**Create RFP**
+```bash
+POST http://localhost:3001/api/rfps
+Content-Type: application/json
+
+{
+  "description": "I need 20 laptops with 16GB RAM, budget $50000, delivery 30 days"
+}
+```
+
+**Get All RFPs**
+```bash
+GET http://localhost:3001/api/rfps
+```
+
+**Send RFP to Vendors**
+```bash
+POST http://localhost:3001/api/rfps/:rfpId/send
+Content-Type: application/json
+
+{
+  "vendorIds": ["vendor1_id", "vendor2_id"]
+}
+```
+
+### Vendor Endpoints
+
+**Create Vendor**
+```bash
+POST http://localhost:3001/api/vendors
+Content-Type: application/json
+
+{
+  "name": "TechCorp Solutions",
+  "email": "sales@techcorp.com",
+  "phone": "+1-555-0101",
+  "contactPerson": "John Smith"
+}
+```
+
+**Get All Vendors**
+```bash
+GET http://localhost:3001/api/vendors
+```
+
+### Proposal Endpoints
+
+**Create Proposal**
+```bash
+POST http://localhost:3001/api/proposals
+Content-Type: application/json
+
+{
+  "rfpId": "rfp_id_here",
+  "vendorId": "vendor_id_here",
+  "rawContent": "We quote $40,000 for 20 laptops..."
+}
+```
+
+**Compare Proposals**
+```bash
+POST http://localhost:3001/api/proposals/compare/:rfpId
+```
+
+### Email Endpoints
+
+**Check for New Emails**
+```bash
+GET http://localhost:3001/api/email/check
+```
+
+**Start Auto-Polling**
+```bash
+POST http://localhost:3001/api/email/start-polling
+```
 
 ---
 
-**This system demonstrates complete AI-powered digital transformation of the procurement process, meeting all assignment requirements with production-ready architecture.**
+## 🔍 Troubleshooting
+
+### MongoDB Connection Failed
+
+**Error:** `MongoServerError: connect ECONNREFUSED`
+
+**Solution:**
+```bash
+# Windows
+net start MongoDB
+
+# Mac/Linux
+sudo systemctl start mongod
+```
+
+### SendGrid Email Not Sending
+
+**Error:** `Sender email not verified`
+
+**Solution:**
+1. Go to: https://app.sendgrid.com/settings/sender_auth/senders
+2. Verify your email address
+3. Check spam folder for verification email
+
+### Gmail Not Receiving Emails
+
+**Error:** `Gmail credentials not configured`
+
+**Solution:**
+1. Enable 2-Step Verification: https://myaccount.google.com/security
+2. Generate App Password: https://myaccount.google.com/apppasswords
+3. Add to `.env`: `GMAIL_APP_PASSWORD="xxxx xxxx xxxx xxxx"`
+
+### Emails Not Being Detected
+
+**Issue:** Vendor replies not showing up
+
+**Solution:**
+1. Check Gmail inbox (look in Spam folder)
+2. Ensure subject contains "RFP" (e.g., "Re: RFP: Laptop Procurement")
+3. Mark emails as unread if already read
+4. Click "Check for New Emails" button
+5. Check backend terminal for logs
+
+### Port Already in Use
+
+**Error:** `Port 3001 is already in use`
+
+**Solution:**
+```bash
+# Windows - Kill process on port 3001
+netstat -ano | findstr :3001
+taskkill /PID <PID> /F
+
+# Mac/Linux
+lsof -ti:3001 | xargs kill -9
+```
+
+### Gemini API Error
+
+**Error:** `API key not valid`
+
+**Solution:**
+1. Get new key: https://makersuite.google.com/app/apikey
+2. Update `GEMINI_API_KEY` in `.env`
+3. Restart backend server
+
+### Frontend Not Loading
+
+**Issue:** Blank page or connection refused
+
+**Solution:**
+1. Check backend is running on port 3001
+2. Check frontend is running on port 3000
+3. Clear browser cache (Ctrl+Shift+Delete)
+4. Check browser console for errors (F12)
+
+---
+
+## 🎯 Demo Test Data
+
+Use this complete test scenario for demonstration:
+
+### RFP Description
+```
+I need 50 Dell or HP laptops with Intel i7 processor, 16GB RAM, 512GB SSD, and Windows 11 Pro. Also need 50 wireless keyboards, 50 wireless mice, and 3 network switches with 24 ports each. Budget is $85,000. Delivery required within 30 days. Payment terms: Net 30. Warranty must be at least 1 year.
+```
+
+### Vendor 1: TechCorp Solutions
+```
+Dear Procurement Team,
+
+Thank you for your RFP. We are pleased to submit our proposal:
+
+PRICING BREAKDOWN:
+- 50x Dell Latitude 5540 Laptops (i7-1355U, 16GB RAM, 512GB SSD, Win11 Pro): $1,450 each = $72,500
+- 50x Logitech K380 Wireless Keyboards: $35 each = $1,750
+- 50x Logitech M720 Wireless Mice: $28 each = $1,400
+- 3x Cisco SG250-26 24-Port Gigabit Switches: $450 each = $1,350
+
+TOTAL: $77,000
+
+DELIVERY: 21 days from PO
+WARRANTY: 3-year manufacturer warranty on laptops, 2-year on switches, 1-year on peripherals
+PAYMENT TERMS: Net 30 days
+ADDITIONAL: Free shipping, on-site setup support included
+
+Best regards,
+John Smith
+TechCorp Solutions
+```
+
+### Vendor 2: Digital Supplies Inc
+```
+Hi there,
+
+Here's our quote for your requirements:
+
+HP EliteBook 840 G10 (i7-1365U, 16GB, 512GB NVMe, Win11 Pro) - 50 units @ $1,380/unit = $69,000
+Microsoft Wireless Desktop 900 (keyboard + mouse combo) - 50 sets @ $45/set = $2,250
+Netgear GS324 24-port switches - 3 units @ $380/unit = $1,140
+
+Grand Total: $72,390
+
+We can deliver in 25 days. Standard 1-year warranty on everything. Payment: Net 30.
+
+Let me know if you need any changes!
+
+Sarah Johnson
+Digital Supplies Inc
+```
+
+### Vendor 3: Enterprise IT Partners
+```
+PROPOSAL FOR RFP
+
+ITEM QUOTATION:
+
+1. Laptops (Dell Precision 3581)
+   - Specifications: Intel Core i7-13700H, 16GB DDR5, 512GB PCIe SSD, Windows 11 Pro
+   - Quantity: 50
+   - Unit Price: $1,620
+   - Subtotal: $81,000
+
+2. Wireless Keyboards (Dell KB700) - 50 units @ $42 = $2,100
+3. Wireless Mice (Dell MS5120W) - 50 units @ $32 = $1,600
+4. Network Switches (TP-Link TL-SG3428 24-port Managed) - 3 units @ $520 = $1,560
+
+TOTAL COST: $86,260
+
+TERMS & CONDITIONS:
+- Delivery Timeline: 28 days
+- Warranty: 5-year ProSupport on laptops, 3-year on switches, 2-year on peripherals
+- Payment: Net 45 days
+
+NOTE: Price exceeds budget by $1,260 but includes premium enterprise-grade equipment.
+
+Michael Chen
+Enterprise IT Partners
+```
+
+---
+
+## 🏗️ Project Structure
+
+```
+RFP Management System/
+├── backend/
+│   ├── src/
+│   │   ├── routes/          # API endpoints
+│   │   ├── services/        # Business logic (AI, Email)
+│   │   ├── utils/           # Database, helpers
+│   │   └── server.js        # Express server
+│   ├── .env                 # Configuration (create this)
+│   ├── .env.example         # Template
+│   └── package.json         # Dependencies
+├── frontend/
+│   ├── src/
+│   │   ├── components/      # Reusable UI components
+│   │   ├── pages/           # Page components
+│   │   ├── services/        # API calls
+│   │   └── App.js           # Main app
+│   └── package.json         # Dependencies
+└── README.md                # This file
+```
+
+---
+
+## 🤖 AI Integration Details
+
+### Google Gemini Usage
+
+**1. RFP Parsing**
+- Converts natural language to structured JSON
+- Extracts: items, quantities, specs, budget, delivery date
+
+**2. Proposal Parsing**
+- Extracts pricing from unstructured vendor emails
+- Handles various formats: $1,000 / 1000 / 1k
+- Identifies: total price, item prices, delivery, warranty
+
+**3. Proposal Comparison**
+- 100-point scoring system
+- Multi-factor analysis (price, delivery, warranty, terms)
+- Generates pros/cons and recommendations
+
+---
+
+## 📞 Support
+
+If you encounter issues:
+
+1. Check [Troubleshooting](#troubleshooting) section
+2. Verify all prerequisites are installed
+3. Check `.env` configuration
+4. Review backend terminal logs for errors
+5. Check browser console (F12) for frontend errors
+
+---
+
+## 📄 License
+
+This project is for educational/demonstration purposes.
+
+---
+
+**Built with ❤️ using React, Node.js, MongoDB, and Google Gemini AI**

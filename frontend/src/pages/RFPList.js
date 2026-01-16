@@ -5,7 +5,7 @@ import { rfpAPI } from '../services/api';
 import toast from 'react-hot-toast';
 
 const RFPList = () => {
-  const [rfps, setRfps] = useState([]);
+  const [rfps, setRfps] = useState([]);                         //Stores all RFPs fetched from backend
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -14,7 +14,7 @@ const RFPList = () => {
 
   const fetchRFPs = async () => {
     try {
-      const response = await rfpAPI.getAll();
+      const response = await rfpAPI.getAll();               //gets all rfps frpm backend
       setRfps(response.data);
     } catch (error) {
       console.error('Error fetching RFPs:', error);

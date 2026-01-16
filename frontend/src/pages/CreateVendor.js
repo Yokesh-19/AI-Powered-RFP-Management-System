@@ -32,7 +32,7 @@ const CreateVendor = () => {
     setIsLoading(true);
     
     try {
-      await vendorAPI.create(formData);
+      await vendorAPI.create(formData);                  //sends a post request to backend to save new vendor
       toast.success('Vendor created successfully!');
       navigate('/vendors');
     } catch (error) {
@@ -114,7 +114,7 @@ const CreateVendor = () => {
           <div className="flex justify-between items-center">
             <button
               type="button"
-              onClick={() => navigate('/vendors')}
+              onClick={() => navigate('/vendors')}                      //navigates to vendor list page
               className="btn btn-secondary"
               disabled={isLoading}
             >

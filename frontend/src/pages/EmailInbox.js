@@ -8,11 +8,11 @@ const EmailInbox = () => {
   const [lastChecked, setLastChecked] = useState(null);
   const [autoPolling, setAutoPolling] = useState(false);
 
-  useEffect(() => {
+  useEffect(() => {                               //intial fetch of proposals
     fetchAllProposals();
   }, []);
 
-  useEffect(() => {
+  useEffect(() => {                               //Check emails every 30 seconds
     let interval;
     if (autoPolling) {
       interval = setInterval(() => {
@@ -24,7 +24,7 @@ const EmailInbox = () => {
 
   const fetchAllProposals = async () => {
     try {
-      const response = await proposalAPI.getAll();
+      const response = await proposalAPI.getAll();                //api call to get all proposals
       setProposals(response.data);
     } catch (error) {
       console.error('Error fetching proposals:', error);
@@ -52,7 +52,7 @@ const EmailInbox = () => {
     }
   };
 
-  const toggleAutoPolling = async () => {
+  const toggleAutoPolling = async () => {          //toggle auto polling on/off
     try {
       if (autoPolling) {
         await emailAPI.stopPolling();
@@ -67,7 +67,7 @@ const EmailInbox = () => {
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status) => {             //shows color based on result
     switch (status) {
       case 'PARSED': return '#16a34a';
       case 'INCOMPLETE': return '#f59e0b';
@@ -201,9 +201,9 @@ const EmailInbox = () => {
                   </div>
                 )}
 
-                <details>
-                  <summary style={{ cursor: 'pointer', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-                    📄 View Raw Email Content
+                <details>                                                                                  
+                  <summary style={{ cursor: 'pointer', fontWeight: 'bold', marginBottom: '0.5rem' }}>      
+                    📄 View Raw Email Content                                                             
                   </summary>
                   <pre style={{ 
                     padding: '1rem', 

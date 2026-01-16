@@ -49,7 +49,7 @@ const EditVendor = () => {
     setIsSaving(true);
 
     try {
-      await vendorAPI.update(id, formData);
+      await vendorAPI.update(id, formData);                           //Api call to update vendor
       toast.success('Vendor updated successfully');
       navigate('/vendors');
     } catch (error) {

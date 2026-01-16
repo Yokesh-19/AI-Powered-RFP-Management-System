@@ -19,12 +19,12 @@ const CreateRFP = () => {
     setIsLoading(true);
     
     try {
-      const response = await rfpAPI.create(description);
+      const response = await rfpAPI.create(description);                 //sends a post request to backend (api/rfps)
       toast.success('RFP created successfully!');
       console.log('Created RFP:', response.data);
       // Use the _id field for navigation
-      const rfpId = response.data._id || response.data.id;
-      navigate(`/rfps/${rfpId}`);
+      const rfpId = response.data._id || response.data.id;                     //id of the new rfp
+      navigate(`/rfps/${rfpId}`);                                   //navigating to rfp details page to view and select vendor
     } catch (error) {
       console.error('Error creating RFP:', error);
       toast.error(error.response?.data?.error || 'Failed to create RFP');

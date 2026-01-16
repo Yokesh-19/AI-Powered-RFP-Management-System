@@ -3,14 +3,14 @@ import axios from 'axios';
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
 const api = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
+  baseURL: `${API_BASE_URL}/api`,                             //base url for api calls
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 // RFP API
-export const rfpAPI = {
+export const rfpAPI = {                                        
   create: (description) => 
     api.post('/rfps', { description }),
   
@@ -20,7 +20,7 @@ export const rfpAPI = {
   getById: (id) => 
     api.get(`/rfps/${id}`),
   
-  sendToVendors: (id, vendorIds) => 
+  sendToVendors: (id, vendorIds) =>                                  //send rfp to vendors
     api.post(`/rfps/${id}/send`, { vendorIds }),
   
   delete: (id) => 
@@ -29,14 +29,14 @@ export const rfpAPI = {
 
 // Vendor API
 export const vendorAPI = {
-  create: (vendor) => 
-    api.post('/vendors', vendor),
+  create: (vendor) =>                                               
+    api.post('/vendors', vendor),                                   //api call to create vendor
   
   getAll: () => 
     api.get('/vendors'),
   
   getById: (id) => 
-    api.get(`/vendors/${id}`),
+    api.get(`/vendors/${id}`),                                        
   
   update: (id, vendor) => 
     api.put(`/vendors/${id}`, vendor),
@@ -48,7 +48,7 @@ export const vendorAPI = {
 // Proposal API
 export const proposalAPI = {
   create: (proposal) => 
-    api.post('/proposals', proposal),
+    api.post('/proposals', proposal),                                //api call to create proposal
   
   getAll: () => 
     api.get('/proposals/all'),
@@ -62,11 +62,11 @@ export const proposalAPI = {
 
 // Email API
 export const emailAPI = {
-  checkForNew: () => 
+  checkForNew: () =>                                      //api call to check for new emails
     api.get('/email/check'),
   
   startPolling: () => 
-    api.post('/email/start-polling'),
+    api.post('/email/start-polling'),                      
   
   stopPolling: () => 
     api.post('/email/stop-polling'),

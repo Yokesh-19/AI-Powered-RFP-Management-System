@@ -20,10 +20,10 @@ const RFPDetail = () => {
 
   const fetchData = async () => {
     try {
-      const [rfpResponse, vendorsResponse, proposalsResponse] = await Promise.all([
-        rfpAPI.getById(id),
-        vendorAPI.getAll(),
-        proposalAPI.getByRFP(id)
+      const [rfpResponse, vendorsResponse, proposalsResponse] = await Promise.all([                        //parallel api calls
+        rfpAPI.getById(id),                                                                                //gets rfp by id
+        vendorAPI.getAll(),                                                                                //gets all vendors
+        proposalAPI.getByRFP(id)                                                                           //gets all proposals for this rfp
       ]);
       
       setRfp(rfpResponse.data);
@@ -81,11 +81,11 @@ const RFPDetail = () => {
     );
   };
 
-  const handleCompareProposals = async () => {
+  const handleCompareProposals = async () => {                                      //Calls AI comparison API
     setIsComparing(true);
     try {
-      const response = await proposalAPI.compare(id);
-      setComparison(response.data);
+      const response = await proposalAPI.compare(id);                              //
+      setComparison(response.data);                                                //saves the reponse
       toast.success('Proposals compared successfully!');
     } catch (error) {
       console.error('Error comparing proposals:', error);
@@ -152,7 +152,7 @@ const RFPDetail = () => {
         )}
       </div>
 
-      {rfp.status === 'DRAFT' && (
+      {rfp.status === 'DRAFT' && (                                        //if draft you should select vendors to AI analyze
         <div className="card mb-4">
           <h3 className="font-bold mb-4">Send to Vendors</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
@@ -187,7 +187,7 @@ const RFPDetail = () => {
         </div>
       )}
 
-      {proposals.length > 0 && (
+      {proposals.length > 0 && (                                                        //displays proposals ,vendors ,status
         <div className="card">
           <h3 className="font-bold mb-4">Vendor Proposals ({proposals.length})</h3>
           <div className="table">
@@ -244,7 +244,7 @@ const RFPDetail = () => {
         </div>
       )}
 
-      {isComparing && (
+      {isComparing && (                                                 //shows analyzing status
         <div className="card mt-4" style={{ padding: '2rem', textAlign: 'center', backgroundColor: '#f0f9ff' }}>
           <div className="spinner" style={{ width: '40px', height: '40px', margin: '0 auto 1rem' }}></div>
           <p style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>🤖 AI is analyzing proposals...</p>
@@ -254,7 +254,7 @@ const RFPDetail = () => {
         </div>
       )}
 
-      {comparison && (
+      {comparison && (                                                         //displays AI comparison results
         <div className="card mt-4">
           {/* Prominent Recommendation Banner */}
           {comparison.recommendation && (

@@ -9,7 +9,7 @@ const Dashboard = () => {
     activeRFPs: 0,
     completedRFPs: 0
   });
-  const [recentRFPs, setRecentRFPs] = useState([]);
+  const [recentRFPs, setRecentRFPs] = useState([]);             
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -18,16 +18,16 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const [rfpsResponse, vendorsResponse] = await Promise.all([
+      const [rfpsResponse, vendorsResponse] = await Promise.all([       //both api calls done in parallel
         rfpAPI.getAll(),
         vendorAPI.getAll()
       ]);
 
-      const rfps = rfpsResponse.data;
-      const vendors = vendorsResponse.data;
+      const rfps = rfpsResponse.data;                      //array of rfps
+      const vendors = vendorsResponse.data;             
 
       setStats({
-        totalRFPs: rfps.length,
+        totalRFPs: rfps.length,                           //to calculate counts
         totalVendors: vendors.length,
         activeRFPs: rfps.filter(rfp => ['DRAFT', 'SENT', 'RECEIVING_PROPOSALS'].includes(rfp.status)).length,
         completedRFPs: rfps.filter(rfp => rfp.status === 'COMPLETED').length
@@ -53,7 +53,7 @@ const Dashboard = () => {
     <div>
       <h1 className="text-lg font-bold mb-4">RFP Management Dashboard</h1>
       
-      {/* Stats Cards */}
+      {/* Stats Cards  shows total number of RFPs,vendors,active rfps,etc.*/}              
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
         <div className="card text-center">
           <h3 className="text-lg font-bold" style={{ color: '#2563eb' }}>{stats.totalRFPs}</h3>

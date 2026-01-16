@@ -66,8 +66,11 @@ class GmailReceiver {
           return;
         }
 
-        // Search for unread emails with "RFP" in subject
-        this.imap.search(['UNSEEN', ['SUBJECT', 'RFP']], (err, results) => {
+        // Search for emails with "RFP" in subject from last 7 days
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        
+        this.imap.search([['SUBJECT', 'RFP'], ['SINCE', sevenDaysAgo]], (err, results) => {
           if (err) {
             reject(err);
             return;
@@ -79,34 +82,41 @@ class GmailReceiver {
             return;
           }
 
-          console.log(`📬 Found ${results.length} new vendor email(s)`);
+          console.log(`📬 Found ${results.length} RFP email(s) from last 7 days`);
 
-          const fetch = this.imap.fetch(results, { bodies: '', markSeen: true });
+          const fetch = this.imap.fetch(results, { bodies: '', markSeen: false });
           const emails = [];
+          const promises = [];
 
           fetch.on('message', (msg) => {
-            msg.on('body', (stream) => {
-              simpleParser(stream, async (err, parsed) => {
-                if (err) {
-                  console.error('Error parsing email:', err);
-                  return;
-                }
+            const promise = new Promise((resolveMsg) => {
+              msg.on('body', (stream) => {
+                simpleParser(stream, (err, parsed) => {
+                  if (err) {
+                    console.error('Error parsing email:', err);
+                    resolveMsg();
+                    return;
+                  }
 
-                emails.push({
-                  from: parsed.from.text,
-                  to: parsed.to.text,
-                  subject: parsed.subject,
-                  text: parsed.text,
-                  html: parsed.html,
-                  date: parsed.date
+                  emails.push({
+                    from: parsed.from.text,
+                    to: parsed.to ? parsed.to.text : '',
+                    subject: parsed.subject,
+                    text: parsed.text,
+                    html: parsed.html,
+                    date: parsed.date
+                  });
+                  resolveMsg();
                 });
               });
             });
+            promises.push(promise);
           });
 
           fetch.once('error', reject);
 
-          fetch.once('end', () => {
+          fetch.once('end', async () => {
+            await Promise.all(promises);
             resolve(emails);
           });
         });
